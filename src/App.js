@@ -9,20 +9,14 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
 firebase.initializeApp({
-  apiKey: "AIzaSyDQE4zwXhARxNdfWJY591jlqa2JTlZMI1Y",
-  authDomain: "fir-react-chat-workshop.firebaseapp.com",
-  projectId: "fir-react-chat-workshop",
-  storageBucket: "fir-react-chat-workshop.appspot.com",
-  messagingSenderId: "239064656534",
-  appId: "1:239064656534:web:39cad15580f08da026b0b7",
-  measurementId: "G-3TR24THQ57",
+  //Add your firebase config settings here
 });
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 
 function App() {
-  const [user] = useAuthState(auth);
+  // Get the user object from your firebase auth
 
   return (
     <div className="App">
@@ -31,15 +25,17 @@ function App() {
         <SignOut />
       </header>
 
-      <section>{user ? <ChatRoom /> : <SignIn />}</section>
+      <section>{
+        //If a user has signed in show them the chat room, otherwise show the login button
+      }</section>
     </div>
   );
 }
 
 function SignIn() {
   const signInWithGoogle = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+    //Set up the google authentication provider
+    //Set up the firebase authentication method
   };
 
   return <button onClick={signInWithGoogle}>Sign in with Google</button>;
@@ -47,16 +43,16 @@ function SignIn() {
 
 function SignOut() {
   return (
-    auth.currentUser && <button onClick={() => auth.signOut()}>Sign Out</button>
+    //If a user is signed in, allow them to sign out
   );
 }
 
 function ChatRoom() {
-  const messagesRef = firestore.collection("messages");
-  const query = messagesRef.orderBy("createdAt").limit(25);
+  //Access the firestore collection where messages are stored
+  //Order the messages so the oldest are at the top
   
-  const [messages] = useCollectionData(query, { idField: "id" });
-  const [formValue, setFormValue] = useState('');
+  //Query the database for messages
+  //Use a controlled input to store message data
   
   const dummy = useRef();
   useEffect(() => {
@@ -68,15 +64,10 @@ function ChatRoom() {
   const sendMessage = async(e) => {
     e.preventDefault();
 
-    const { uid, photoURL, displayName, email } = auth.currentUser;
+    //Get user data for your currently signed in user
 
     await messagesRef.add({
-      text: formValue,  
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      uid,
-      photoURL,
-      displayName,
-      email
+      //declare user, and message data to be written to the database
     })
 
     setFormValue('')
@@ -85,19 +76,14 @@ function ChatRoom() {
   return (
     <>
       <main>
-        {messages &&
-          messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
+        {
+          //check for messages, and display all messages in the chat window
+        }
         <span ref={dummy}></span>
       </main>
       <form onSubmit={sendMessage}>
-        <input
-          type="text"
-          value={formValue}
-          onChange={(e) => setFormValue(e.target.value)}
-          placeholder="Your message here..."
-        />
+        {/*Set up the input so it is controlled by the component's state*/}
+        <input />
         <button type="submit" disabled={!formValue}>
           Submit
         </button>
@@ -107,9 +93,9 @@ function ChatRoom() {
 }
 
 function ChatMessage(props) {
-  const { text, uid, photoURL } = props.message;
+  // Get all data to display the message from props
 
-  const messageClass = uid === auth.currentUser.uid ? "sent" : "received";
+  // Determine whether the message was sent by the currently signed in user
 
   return (
     <div className={`message ${messageClass}`}>
